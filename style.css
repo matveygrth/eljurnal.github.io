@@ -1,0 +1,205 @@
+/* Обнуление */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg: #0d1117;
+    --side: #161b22;
+    --card: #21262d;
+    --accent: #58a6ff;
+    --text: #c9d1d9;
+    --border: #30363d;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Экран входа */
+.full-page-center {
+    width: 100%; height: 100vh;
+    display: flex; justify-content: center; align-items: center;
+    background: radial-gradient(circle at center, #161b22 0%, #0d1117 100%);
+}
+
+.auth-card {
+    background: var(--side);
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    width: 350px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+/* Сетка приложения */
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    width: 100%;
+    height: 100vh;
+}
+
+/* Боковая панель */
+.main-sidebar {
+    background: var(--side);
+    border-right: 1px solid var(--border);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.brand { font-size: 24px; font-weight: bold; color: var(--accent); margin-bottom: 30px; }
+
+.user-profile-card {
+    background: var(--card);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.avatar-circle {
+    width: 40px; height: 40px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: bold;
+}
+
+/* Синяя галочка */
+.blue-badge {
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    margin-left: 5px;
+    box-shadow: 0 0 15px var(--accent);
+}
+
+/* Формы и Инпуты */
+input {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: white;
+    margin-bottom: 15px;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+}
+
+.btn-add-record, .btn-login-submit {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.btn-add-record:hover { background: #79c0ff; }
+
+/* Таблица */
+.main-viewport { padding: 40px; overflow-y: auto; width: 100%; }
+
+.stats-overview {
+    display: flex; gap: 30px; margin-bottom: 30px;
+}
+
+.stat-item {
+    background: var(--side);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    min-width: 150px;
+}
+
+.table-card {
+    background: var(--side);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+table { width: 100%; border-collapse: collapse; }
+th { background: var(--card); padding: 15px; text-align: left; font-size: 13px; }
+td { padding: 15px; border-bottom: 1px solid var(--border); }
+
+.btn-link {
+    background: none; border: none; color: #0ea5e9; 
+    text-decoration: underline; cursor: pointer; font-size: 14px;
+}
+.check-row {
+    display: flex; align-items: center; gap: 10px; 
+    margin: 10px 0; font-size: 14px; color: #94a3af;
+}
+.glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px; border-radius: 20px;
+}
+/* Остальные стили из предыдущих ответов сохраняются */
+
+:root { --bg: #0b0e14; --accent: #0ea5e9; --border: rgba(255,255,255,0.1); }
+body { margin: 0; font-family: sans-serif; background: var(--bg); color: white; }
+
+/* Вход */
+.auth-page { display: flex; justify-content: center; align-items: center; height: 100vh; }
+.auth-card { background: rgba(255,255,255,0.03); padding: 40px; border-radius: 20px; border: 1px solid var(--border); width: 320px; text-align: center; }
+
+/* Журнал */
+.dashboard-layout { display: grid; grid-template-columns: 300px 1fr; height: 100vh; }
+.sidebar { background: #111827; padding: 25px; border-right: 1px solid var(--border); }
+.main-viewport { padding: 40px; overflow-y: auto; }
+
+/* Элементы */
+input { width: 100%; padding: 12px; margin: 10px 0; background: #030712; border: 1px solid var(--border); border-radius: 8px; color: white; box-sizing: border-box; }
+.btn-primary { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+.btn-link { background: none; border: none; color: var(--accent); cursor: pointer; text-decoration: underline; }
+.btn-logout { color: #ef4444; background: none; border: none; cursor: pointer; margin-top: 50px; }
+.btn-verify { font-size: 11px; border: 1px solid var(--accent); color: var(--accent); background: none; padding: 4px; border-radius: 5px; cursor: pointer; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+td, th { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: #64748b; font-size: 12px; }
+
+:root { --bg: #0d1117; --accent: #2f81f7; --border: #30363d; }
+body { margin: 0; font-family: sans-serif; background: var(--bg); color: white; }
+
+/* Блок профиля вверху */
+.user-profile {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(255,255,255,0.05); padding: 15px;
+    border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--border);
+}
+.avatar-box { width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+.status { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+.user-profile h3 { margin: 0; font-size: 16px; }
+
+/* Остальное */
+.dashboard { display: grid; grid-template-columns: 320px 1fr; height: 100vh; }
+.sidebar { background: #161b22; padding: 25px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+.content { padding: 40px; overflow-y: auto; }
+input { width: 100%; padding: 12px; margin: 8px 0; background: #0d1117; border: 1px solid var(--border); border-radius: 8px; color: white; box-sizing: border-box; }
+.btn-primary { width: 100%; background: var(--accent); border: none; padding: 12px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+td, th { padding: 15px; border-bottom: 1px solid var(--border); text-align: left; }
+.auth-page { display: flex; justify-content: center; align-items: center; height: 100vh; }
+.glass { background: #161b22; padding: 30px; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
+
+
+

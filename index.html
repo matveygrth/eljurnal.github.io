@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProJournal System v4.0</title>
+    <style>
+        :root { --bg: #0d1117; --side: #161b22; --accent: #2f81f7; --border: #30363d; --text: #c9d1d9; --danger: #f85149; }
+        * { box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+        /* Экран входа */
+        .auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; background: radial-gradient(circle at center, #1e293b 0%, #0d1117 100%); }
+        .auth-card { background: var(--side); padding: 40px; border-radius: 20px; border: 1px solid var(--border); width: 350px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        
+        /* Сетка журнала */
+        .dashboard { display: none; grid-template-columns: 320px 1fr; height: 100vh; }
+        .sidebar { background: var(--side); padding: 25px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        
+        /* Блок аккаунта */
+        .user-profile { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; margin-bottom: 30px; border-left: 4px solid var(--accent); }
+        .user-profile p { font-size: 10px; color: var(--accent); text-transform: uppercase; margin: 0; font-weight: bold; letter-spacing: 1px; }
+        .user-profile h3 { margin: 5px 0; font-size: 18px; color: white; }
+        .v-badge { color: var(--accent); font-size: 12px; font-weight: bold; text-shadow: 0 0 10px var(--accent); }
+
+        /* Формы и Таблица */
+        input { width: 100%; padding: 12px; margin: 10px 0; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: white; outline: none; }
+        input:focus { border-color: var(--accent); }
+        .btn { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+        
+        .content { padding: 40px; overflow-y: auto; width: 100%; }
+        table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.02); border-radius: 12px; overflow: hidden; }
+        th { text-align: left; padding: 15px; background: rgba(255,255,255,0.05); color: #8b949e; font-size: 12px; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid var(--border); }
+        
+        .del-btn { color: var(--danger); background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px 10px; border-radius: 5px; }
+        .del-btn:hover { background: rgba(248, 81, 73, 0.1); }
+        .link { color: var(--accent); cursor: pointer; text-decoration: none; font-size: 13px; background: none; border: none; padding: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- ЭКРАН АВТОРИЗАЦИИ -->
+    <div id="authPage" class="auth-container">
+        <div class="auth-card">
+            <h2 id="authTitle">Вход в ProJournal</h2>
+            <input type="text" id="userInput" placeholder="Логин">
+            <input type="password" id="passInput" placeholder="Пароль">
+            <div id="regOptions" style="display:none; margin: 10px 0;">
+                <label style="font-size: 13px; color: #8b949e; cursor: pointer;">
+                    <input type="checkbox" id="verifyInput"> Получить синюю галочку ✔
+                </label>
+            </div>
+            <button class="btn" onclick="app.processAuth()" id="mainBtn">Войти</button>
+            <p id="switchBox" style="margin-top: 20px; font-size: 13px;">
+                Нет аккаунта? <button class="link" onclick="app.toggleMode(true)">Создать</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- ЭКРАН ЖУРНАЛА -->
+    <div id="appPage" class="dashboard">
+        <aside class="sidebar">
+            <div class="user-profile">
+                <p>Администратор</p>
+                <h3 id="profName">User</h3>
+                <div id="profBadge"></div>
+            </div>
+
+            <form id="addForm">
+                <p style="font-size: 12px; color: #8b949e; margin-bottom: 10px;">Добавление в БД:</p>
+                <input type="text" id="sName" placeholder="ФИО Студента" required>
+                <input type="text" id="sSub" placeholder="Предмет" required>
+                <input type="number" id="sGrade" min="1" max="740" placeholder="Оценка" required>
+                <button type="submit" class="btn">Внести запись</button>
+            </form>
+
+            <button onclick="app.logout()" class="link" style="margin-top: auto; color: var(--danger); text-align: left;">
+                Выйти из системы
+            </button>
+        </aside>
+
+        <main class="content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
+                <h1 style="margin:0;">Журнал успеваемости</h1>
+                <div style="background:var(--side); padding:10px 20px; border-radius:10px; border:1px solid var(--border);">
+                    Записей: <b id="count">0</b>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Студент</th><th>Предмет</th><th>Балл</th><th style="width: 50px;"></th></tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </main>
+    </div>
+
+    <script>
+        const app = {
+            // "База данных" в памяти браузера
+            db_users: JSON.parse(localStorage.getItem('pj_users_db')) || {},
+            db_journal: JSON.parse(localStorage.getItem('pj_journal_db')) || [],
+            isReg: false,
+
+            // Переключение Вход / Регистрация
+            toggleMode: function(val) {
+                this.isReg = val;
+                document.getElementById('authTitle').innerText = val ? "Регистрация" : "Вход в ProJournal";
+                document.getElementById('mainBtn').innerText = val ? "Зарегистрироваться" : "Войти";
+                document.getElementById('regOptions').style.display = val ? "block" : "none";
+                document.getElementById('switchBox').innerHTML = val ? 
+                    'Уже есть аккаунт? <button class="link" onclick="app.toggleMode(false)">Войти</button>' : 
+                    'Нет аккаунта? <button class="link" onclick="app.toggleMode(true)">Создать</button>';
+            },
+
+            // Обработка кнопок Входа и Регистрации
+            processAuth: function() {
+                const u = document.getElementById('userInput').value.trim();
+                const p = document.getElementById('passInput').value.trim();
+                const v = document.getElementById('verifyInput').checked;
+
+                if(!u || !p) return alert("Заполните все поля!");
+
+                if(this.isReg) {
+                    if(this.db_users[u]) return alert("Этот логин уже занят!");
+                    this.db_users[u] = { pass: p, verified: v };
+                    localStorage.setItem('pj_users_db', JSON.stringify(this.db_users));
+                    alert("Регистрация успешна! Теперь войдите.");
+                    this.toggleMode(false);
+                } else {
+                    if(this.db_users[u] && this.db_users[u].pass === p) {
+                        sessionStorage.setItem('pj_active_user', u);
+                        this.initDashboard();
+                    } else {
+                        alert("Неверный логин или пароль!");
+                    }
+                }
+            },
+
+            // Запуск основного интерфейса
+            initDashboard: function() {
+                const user = sessionStorage.getItem('pj_active_user');
+                if(!user) return;
+
+                document.getElementById('authPage').style.display = 'none';
+                document.getElementById('appPage').style.display = 'grid';
+                
+                // Информация об аккаунте вверху
+                document.getElementById('profName').innerText = user;
+                if(this.db_users[user] && this.db_users[user].verified) {
+                    document.getElementById('profBadge').innerHTML = '<span class="v-badge">✔ Подтвержденный профиль</span>';
+                }
+                this.renderTable();
+            },
+
+            // Отрисовка таблицы
+            renderTable: function() {
+                const body = document.getElementById('tableBody');
+                body.innerHTML = this.db_journal.map((item, i) => `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${item.subject}</td>
+                        <td><b style="color:var(--accent)">${item.grade}</b></td>
+                        <td><button onclick="app.deleteRow(${i})" class="del-btn">✕</button></td>
+                    </tr>
+                `).join('');
+                document.getElementById('count').innerText = this.db_journal.length;
+                localStorage.setItem('pj_journal_db', JSON.stringify(this.db_journal));
+            },
+
+            // Добавление новой строки
+            addRow: function(n, s, g) {
+                this.db_journal.push({ name: n, subject: s, grade: g });
+                this.renderTable();
+            },
+
+            // Удаление строки
+            deleteRow: function(index) {
+                this.db_journal.splice(index, 1);
+                this.renderTable();
+            },
+
+            // Выход
+            logout: function() {
+                sessionStorage.removeItem('pj_active_user');
+                location.reload();
+            }
+        };
+
+        // Слушатель формы добавления
+        document.getElementById('addForm').onsubmit = function(e) {
+            e.preventDefault();
+            const n = document.getElementById('sName').value;
+            const s = document.getElementById('sSub').value;
+            const g = document.getElementById('sGrade').value;
+            app.addRow(n, s, g);
+            e.target.reset();
+        };
+
+        // Авто-вход если сессия жива
+        window.onload = () => {
+            if(sessionStorage.getItem('pj_active_user')) app.initDashboard();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход — ProJournal</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="javascript.js"></script>
+</head>
+<body class="auth-page">
+    <div class="auth-card glass">
+        <!-- Блок Входа -->
+        <div id="loginBox">
+            <h2>Вход</h2>
+            <input type="text" id="logUser" placeholder="Логин">
+            <input type="password" id="logPass" placeholder="Пароль">
+            <button onclick="handleLogin()" class="btn-primary">Войти</button>
+            <p>Нет аккаунта? <button onclick="toggleAuth(true)" class="btn-link">Создать</button></p>
+        </div>
+
+        <!-- Блок Регистрации -->
+        <div id="regBox" style="display:none;">
+            <h2>Регистрация</h2>
+            <input type="text" id="regUser" placeholder="Придумайте логин">
+            <input type="password" id="regPass" placeholder="Пароль">
+            <label style="display:block; margin:10px 0; font-size:13px; color:#8b949e;">
+                <input type="checkbox" id="regVerify"> Получить синюю галочку ✔
+            </label>
+            <button onclick="handleRegister()" class="btn-primary">Зарегистрироваться</button>
+            <p>Есть аккаунт? <button onclick="toggleAuth(false)" class="btn-link">Назад</button></p>
+        </div>
+    </div>
+
+    <script>
+        // Работа с БД пользователей
+        let users = JSON.parse(localStorage.getItem('pj_users')) || {};
+
+        function toggleAuth(isReg) {
+            document.getElementById('loginBox').style.display = isReg ? 'none' : 'block';
+            document.getElementById('regBox').style.display = isReg ? 'block' : 'none';
+        }
+
+        function handleRegister() {
+            const u = document.getElementById('regUser').value.trim();
+            const p = document.getElementById('regPass').value.trim();
+            const v = document.getElementById('regVerify').checked;
+
+            if(!u || !p) return alert("Заполни поля!");
+            if(users[u]) return alert("Логин занят!");
+
+            users[u] = { pass: p, verified: v };
+            localStorage.setItem('pj_users', JSON.stringify(users));
+            alert("Аккаунт создан! Теперь войдите.");
+            toggleAuth(false);
+        }
+
+        function handleLogin() {
+            const u = document.getElementById('logUser').value.trim();
+            const p = document.getElementById('logPass').value.trim();
+
+            if(users[u] && users[u].pass === p) {
+                sessionStorage.setItem('activeUser', u);
+                window.location.href = 'index.html'; // ПЕРЕХОД В ЖУРНАЛ
+            } else {
+                alert("Неверные данные!");
+            }
+        }
+    </script>
+</body>
+</html>
